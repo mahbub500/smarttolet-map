@@ -1,73 +1,66 @@
-# Welcome to your Lovable project
+# dRestaurant Child — SmartToLet
 
-## Project info
+A WordPress child theme of **dRestaurant** (by wpWax) that adds a
+fully featured **SmartToLet Rental Listings** page template.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## Installation
 
-There are several ways of editing your application.
+1. **Upload** the `drestaurant-child` folder to `wp-content/themes/`.
+2. In WordPress Admin → **Appearance → Themes**, activate **dRestaurant Child - SmartToLet**.
+   (The parent dRestaurant theme must also be installed, but does not need to be active.)
+3. Go to **Pages → Add New** (or edit any existing page).
+4. In the right-hand **Page Attributes** panel, open the **Template** dropdown.
+5. Select **SmartToLet — Rental Listings** and publish/update.
+6. Visit the page on the front end — the full SmartToLet interface will appear.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## File Structure
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+drestaurant-child/
+├── style.css                        ← Child theme header + all SmartToLet CSS
+├── functions.php                    ← Enqueue styles, register & load template
+└── page-templates/
+    └── smarttolet.php               ← The page template (HTML + JS)
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Customising Property Data
 
-**Use GitHub Codespaces**
+Sample listings live in the `STL_DATA` JavaScript array inside
+`page-templates/smarttolet.php`.  Each listing object has:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+| Key           | Type   | Description                      |
+|---------------|--------|----------------------------------|
+| `id`          | int    | Unique identifier                |
+| `title`       | string | Property headline                |
+| `category`    | string | `room` / `flat` / `house`        |
+| `price`       | int    | Monthly rent in £                |
+| `location`    | string | Display address                  |
+| `beds`        | int    | Number of bedrooms               |
+| `baths`       | int    | Number of bathrooms              |
+| `area`        | int    | Floor area in m²                 |
+| `tags`        | array  | Feature tags shown on card       |
+| `description` | string | Full property description        |
+| `owner`       | string | Landlord name                    |
+| `phone`       | string | Contact phone                    |
+| `email`       | string | Contact email                    |
+| `lat` / `lng` | float  | GPS coordinates for map marker   |
+| `image`       | string | Image URL                        |
 
-## What technologies are used for this project?
+To pull live data from WordPress, replace the `STL_DATA` variable with a
+`wp_localize_script()` call in `functions.php` that outputs your ACF or
+custom post type data as JSON.
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Dependencies (loaded automatically)
 
-## How can I deploy this project?
+- **Leaflet.js 1.9.4** — interactive map (CDN)
+- **Google Fonts** — Space Grotesk + Plus Jakarta Sans (CDN)
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+All other styles and scripts are self-contained in the theme files.
