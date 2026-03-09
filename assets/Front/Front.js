@@ -3,6 +3,34 @@
    Scoped to the STL namespace to avoid
    conflicts with WordPress / dRestaurant JS.
 =========================================== */
+
+jQuery(document).ready(function ($) {
+
+    var stl_words = ["Rental", "Home", "Sublet", "Bachelor"];
+    var stl_index = 0;
+
+    setInterval(function () {
+
+        var el = $(".stl-flip-word");
+
+        el.addClass("stl-flip");
+
+        setTimeout(function () {
+
+            stl_index++;
+            if (stl_index >= stl_words.length) {
+                stl_index = 0;
+            }
+
+            el.text(stl_words[stl_index]);
+            el.removeClass("stl-flip");
+
+        }, 300);
+
+    }, 2000);
+
+});
+
 (function () {
     'use strict';
 

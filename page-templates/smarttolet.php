@@ -46,8 +46,16 @@ get_header();
                     <span class="stl-pulse-dot"></span>
                 </div>
 
+                <!-- <h1 class="stl-hero-title">
+                    Find Your Perfect <span class="stl-gradient-text">Rental</span> on the Map
+                </h1> -->
+
                 <h1 class="stl-hero-title">
-                    Find Your <span class="stl-gradient-text">Perfect Rental</span> on the Map
+                    Find Your <span class="stl-gradient-text">Perfect</span>
+                    <span class="stl-flip-wrapper">
+                        <span class="stl-flip-word stl-gradient-text">Rental</span>
+                    </span>
+                    on the Map
                 </h1>
 
                 <p class="stl-hero-description">

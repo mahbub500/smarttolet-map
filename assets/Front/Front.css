@@ -39,6 +39,21 @@
     line-height: 1.6;
 }
 
+.stl-flip-wrapper{
+    display:inline-block;
+    perspective:1000px;
+}
+
+.stl-flip-word{
+    display:inline-block;
+    transform-origin:50% 50%;
+    transition:transform .6s ease;
+}
+
+.stl-flip{
+    transform:rotateX(90deg);
+}
+
 /* -------------------------------------------------------------------
    2. RESETS & BASE
 ------------------------------------------------------------------- */
