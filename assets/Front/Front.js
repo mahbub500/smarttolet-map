@@ -6,28 +6,51 @@
 
 jQuery(document).ready(function ($) {
 
-    var stl_words = ["Rental", "Home", "Sublet", "Bachelor"];
+    var stl_words = [
+        "Rental", 
+        "Home", 
+        "Sublet",
+        "Bachelor", 
+        "Apartment", 
+        "Flat", 
+        "Room"
+    ];
     var stl_index = 0;
+    var stl_charIndex = 0;
+    var stl_currentWord = "";
+    var stl_el = $(".stl-flip-word");
 
-    setInterval(function () {
+    function typeEffect() {
 
-        var el = $(".stl-flip-word");
+        if (stl_charIndex < stl_words[stl_index].length) {
+            stl_currentWord += stl_words[stl_index].charAt(stl_charIndex);
+            stl_el.text(stl_currentWord);
+            stl_charIndex++;
+            setTimeout(typeEffect, 100);
+        } 
+        else {
+            setTimeout(eraseEffect, 1500);
+        }
+    }
 
-        el.addClass("stl-flip");
+    function eraseEffect() {
 
-        setTimeout(function () {
-
+        if (stl_currentWord.length > 0) {
+            stl_currentWord = stl_currentWord.slice(0, -1);
+            stl_el.text(stl_currentWord);
+            setTimeout(eraseEffect, 50);
+        } 
+        else {
             stl_index++;
             if (stl_index >= stl_words.length) {
                 stl_index = 0;
             }
+            stl_charIndex = 0;
+            setTimeout(typeEffect, 300);
+        }
+    }
 
-            el.text(stl_words[stl_index]);
-            el.removeClass("stl-flip");
-
-        }, 300);
-
-    }, 2000);
+    typeEffect();
 
 });
 

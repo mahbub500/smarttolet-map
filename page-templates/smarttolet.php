@@ -42,20 +42,17 @@ get_header();
             <div class="stl-container stl-hero-content">
                 <div class="stl-hero-badge">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:hsl(158 55% 45%)"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/></svg>
-                    All listings are 100% free
+                    All Tolet are 100% free
                     <span class="stl-pulse-dot"></span>
                 </div>
 
-                <!-- <h1 class="stl-hero-title">
-                    Find Your Perfect <span class="stl-gradient-text">Rental</span> on the Map
-                </h1> -->
-
                 <h1 class="stl-hero-title">
-                    Find Your <span class="stl-gradient-text">Perfect</span>
+                    Find Your 
                     <span class="stl-flip-wrapper">
-                        <span class="stl-flip-word stl-gradient-text">Rental</span>
+                        <span class="stl-flip-word stl-gradient-text">Home</span>
                     </span>
-                    on the Map
+                    <br>
+                    on the <span class="stl-gradient-text">Google</span> Map
                 </h1>
 
                 <p class="stl-hero-description">
@@ -63,10 +60,13 @@ get_header();
                 </p>
 
                 <div class="stl-hero-buttons">
-                    <button class="stl-btn stl-btn-lg stl-btn-primary stl-cta-btn" onclick="STL.switchTab('map')">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <a href="#stl-map" class="stl-btn stl-btn-lg stl-btn-primary stl-cta-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
                         Search on Map
-                    </button>
+                    </a>
                     <button class="stl-btn stl-btn-lg stl-btn-outline" onclick="STL.switchTab('listings')">
                         Browse Listings
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -93,7 +93,7 @@ get_header();
         <!-- Map Preview -->
         <section class="stl-map-preview">
             <div class="stl-container">
-                <div class="stl-section-header">
+                <div id="stl-map" class="stl-section-header">
                     <span class="stl-section-tag">📍 Live Map</span>
                     <h2 class="stl-section-title">Explore Properties on the Map</h2>
                     <p class="stl-section-description">Click any pin to view property details instantly</p>
