@@ -121,13 +121,15 @@ jQuery(document).ready(function ($) {
                         category: listing.category || (listing.tags && listing.tags[0] ? listing.tags[0].slug : 'flat'),
                         lat: parseFloat(listing.latitude),
                         lng: parseFloat(listing.longitude),
-                        image: listing.images && listing.images.length > 0 ? listing.images[0].src : '',
+                        image: listing.images && listing.images.length > 0 
+				        ? listing.images[0].src 
+				        : 'https://dummyimage.com/600x400/cccccc/000000&text=No+Image',
                         tags: listing.tags && listing.tags.length > 0 ? listing.tags.map(function (t) { return t.name; }) : [],
                     };
                     STL_DATA.push(simplified);
                 });
 
-                console.log('All listings loaded:', STL_DATA);
+                // console.log('All listings loaded:', STL_DATA);
 
                 // ✅ Now render — data is ready
                 initFeatured();
@@ -136,7 +138,7 @@ jQuery(document).ready(function ($) {
                 updateCategoryCounts();
             })
             .catch(function (error) {
-                console.error('Error fetching listings:', error);
+                // console.error('Error fetching listings:', error);
                 showToast('Failed to load listings. Please refresh the page.', 'error');
             });
     });
