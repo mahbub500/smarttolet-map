@@ -73,14 +73,21 @@ jQuery(document).ready(function ($) {
     /* ---- Sample data (replace with WP REST or ACF calls) ---- */
     var STL_DATA = [
         {
-            id: 1, title: "Cosy Room in Shared House",
-            category: "room", price: 650,
+            id: 1, 
+            title: "Cosy Room in Shared House",
+            category: "room", 
+            price: 650,
             location: "Hackney, London",
-            beds: 1, baths: 1, area: 18,
+            beds: 1, 
+            baths: 1, 
+            area: 18,
             tags: ["Bills Included", "Furnished", "Near Tube"],
             description: "A bright double room in a friendly 4-person house share. All bills included. 5 min walk to Hackney Central station.",
-            owner: "Sarah Mitchell", phone: "+44 7700 900100", email: "sarah@example.com",
-            lat: 51.549, lng: -0.056,
+            owner: "Sarah Mitchell", 
+            phone: "+44 7700 900100", 
+            email: "sarah@example.com",
+            lat: 51.549, 
+            lng: -0.056,
             image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80"
         },
         {
