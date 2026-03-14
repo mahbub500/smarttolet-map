@@ -378,7 +378,7 @@ jQuery(document).ready(function ($) {
             '<div class="stl-property-card-image">' +
             '<img src="' + p.image + '" alt="' + p.title + '" loading="lazy">' +
             '<span class="stl-property-badge ' + p.category + '">' + p.category + '</span>' +
-            '<div class="stl-property-price"><span class="stl-property-price-value">£' + (p.price ? p.price.toLocaleString() : '—') + '</span><span class="stl-property-price-period">/mo</span></div>' +
+            '<div class="stl-property-price"><span class="stl-property-price-value">৳' + (p.price ? p.price.toLocaleString() : '—') + '</span><span class="stl-property-price-period">/mo</span></div>' +
             '</div>' +
             '<div class="stl-property-card-body">' +
             '<h3 class="stl-property-card-title">' + p.title + '</h3>' +
@@ -522,7 +522,7 @@ jQuery(document).ready(function ($) {
                 '<div class="stl-property-card-body">' +
                 '<h3 class="stl-property-card-title">' + p.title + '</h3>' +
                 '<p class="stl-property-card-location">📍 ' + p.location + '</p>' +
-                '<strong style="color:hsl(213 85% 50%);font-family:var(--stl-font-display);">£' + (p.price ? p.price.toLocaleString() : '—') + '/mo</strong>' +
+                '<strong style="color:hsl(213 85% 50%);font-family:var(--stl-font-display);">৳' + (p.price ? p.price.toLocaleString() : '—') + '/mo</strong>' +
                 '</div></div>';
         }).join('');
     }
@@ -551,7 +551,7 @@ jQuery(document).ready(function ($) {
             '<span class="stl-modal-category-badge">' + p.category + '</span>' +
             '<h2 class="stl-modal-title">' + p.title + '</h2>' +
             '<p class="stl-modal-location">📍 ' + p.location + '</p>' +
-            '<p class="stl-modal-price">£' + (p.price ? p.price.toLocaleString() : '—') + '<span style="font-size:1rem;color:hsl(215 18% 50%);font-weight:400;">/month</span></p>' +
+            '<p class="stl-modal-price">৳ ' + (p.price ? p.price.toLocaleString() : '—') + '<span style="font-size:1rem;color:hsl(215 18% 50%);font-weight:400;">/month</span></p>' +
             '<div class="stl-modal-stats">' +
             '<div class="stl-modal-stat"><strong>' + p.beds + '</strong>Bedroom' + (p.beds !== 1 ? 's' : '') + '</div>' +
             '<div class="stl-modal-stat"><strong>' + p.baths + '</strong>Bathroom' + (p.baths !== 1 ? 's' : '') + '</div>' +
