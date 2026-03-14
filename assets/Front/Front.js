@@ -70,110 +70,11 @@ jQuery(document).ready(function ($) {
 (function () {
     'use strict';
 
-   	var url = window.location.origin; // safer than href
-	var api_url = url + '/wp-json/directorist/v1/listings';
+    var url = window.location.origin;
+    var api_url = url + '/wp-json/directorist/v1/listings';
 
-	var listings = [];
-
-	fetch(api_url)
-	    .then(function(response) {
-	        return response.json();
-	    })
-	    .then(function(data) {
-	        // data contains all listings
-	        data.forEach(function(listing) {
-	            var simplified = {
-			        name: listing.name,
-			        slug: listing.slug
-			    };
-	            // you can also push to your array
-	            // listings.push(listing);
-	        });
-
-	        console.log('All listings:', listings);
-	    })
-	    .catch(function(error) {
-	        console.error('Error fetching data:', error);
-	    });
-
-    // alert( api_url );
-
-    /* ---- Sample data (replace with WP REST or ACF calls) ---- */
-    var STL_DATA = [
-        {
-            id: 1, 
-            title: "Cosy Room in Shared House",
-            category: "room", 
-            price: 650,
-            location: "Hackney, London",
-            beds: 1, 
-            baths: 1, 
-            area: 18,
-            tags: ["Bills Included", "Furnished", "Near Tube"],
-            description: "A bright double room in a friendly 4-person house share. All bills included. 5 min walk to Hackney Central station.",
-            owner: "Sarah Mitchell", 
-            phone: "+44 7700 900100", 
-            email: "sarah@example.com",
-            lat: 51.549, 
-            lng: -0.056,
-            image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80"
-        },
-        {
-            id: 2, title: "Modern Studio Flat",
-            category: "flat", price: 1100,
-            location: "Shoreditch, London",
-            beds: 1, baths: 1, area: 35,
-            tags: ["Gym", "Concierge", "City Centre"],
-            description: "A stylish studio apartment in the heart of Shoreditch. New build with high-end finishes and a 24/7 concierge.",
-            owner: "James Clarke", phone: "+44 7700 900200", email: "james@example.com",
-            lat: 51.522, lng: -0.079,
-            image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80"
-        },
-        {
-            id: 3, title: "3-Bed Victorian Terrace",
-            category: "house", price: 2400,
-            location: "Islington, London",
-            beds: 3, baths: 2, area: 110,
-            tags: ["Garden", "Parking", "Period Features"],
-            description: "Spacious Victorian terraced house with a south-facing garden and off-street parking. Recently refurbished.",
-            owner: "Emma White", phone: "+44 7700 900300", email: "emma@example.com",
-            lat: 51.538, lng: -0.102,
-            image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=80"
-        },
-        {
-            id: 4, title: "Bright Single Room",
-            category: "room", price: 550,
-            location: "Bethnal Green, London",
-            beds: 1, baths: 1, area: 12,
-            tags: ["Bills Included", "Short Let OK"],
-            description: "A clean single room in a professional houseshare. Friendly housemates. Close to Victoria Park.",
-            owner: "Tom Harris", phone: "+44 7700 900400", email: "tom@example.com",
-            lat: 51.527, lng: -0.059,
-            image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80"
-        },
-        {
-            id: 5, title: "2-Bed Garden Flat",
-            category: "flat", price: 1800,
-            location: "Stoke Newington, London",
-            beds: 2, baths: 1, area: 68,
-            tags: ["Garden", "Pets Welcome", "Quiet Street"],
-            description: "Lovely ground-floor flat with private garden. Perfect for couples or professionals. Cats and small dogs considered.",
-            owner: "Laura Scott", phone: "+44 7700 900500", email: "laura@example.com",
-            lat: 51.562, lng: -0.074,
-            image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80"
-        },
-        {
-            id: 6, title: "Large Family Home",
-            category: "house", price: 3200,
-            location: "Hampstead, London",
-            beds: 4, baths: 3, area: 180,
-            tags: ["Garden", "Parking", "Near Schools"],
-            description: "Spacious detached family home with a large garden, garage, and excellent school catchment area.",
-            owner: "David Brown", phone: "+44 7700 900600", email: "david@example.com",
-            lat: 51.557, lng: -0.179,
-            image: "https://images.unsplash.com/photo-1464146072230-91cabc968266?w=600&q=80"
-        }
-    ];
+    // Array to store simplified listings
+    var STL_DATA = [];
 
     var homeMap = null, mainMap = null;
     var homeMarkers = [], mainMarkers = [];
@@ -192,22 +93,56 @@ jQuery(document).ready(function ($) {
     /* ---- Init ---- */
     document.addEventListener('DOMContentLoaded', function () {
         initTabs();
-        initFeatured();
-        initListings();
-        initHomeMap();
-        updateCategoryCounts();
-        initPostForm();
         initModal();
+        initPostForm();
+
+        // ✅ FIX: Fetch data first, then render everything
+        fetch(api_url)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                // Build STL_DATA from API response
+                data.forEach(function (listing) {
+                    var simplified = {
+                        id: listing.id,
+                        title: listing.name,
+                        slug: listing.slug,
+                        price: listing.price,
+                        link: listing.permalink,
+                        location: listing.address,
+                        description: listing.description || listing.short_description || "",
+                        owner: listing.author,
+                        phone: listing.phone || "",
+                        email: listing.email || "",
+                        beds: listing.beds || listing.bedrooms || 1,
+                        baths: listing.baths || listing.bathrooms || 1,
+                        area: listing.area || listing.size || null,
+                        category: listing.category || (listing.tags && listing.tags[0] ? listing.tags[0].slug : 'flat'),
+                        lat: parseFloat(listing.latitude),
+                        lng: parseFloat(listing.longitude),
+                        image: listing.images && listing.images.length > 0 ? listing.images[0].src : '',
+                        tags: listing.tags && listing.tags.length > 0 ? listing.tags.map(function (t) { return t.name; }) : [],
+                    };
+                    STL_DATA.push(simplified);
+                });
+
+                console.log('All listings loaded:', STL_DATA);
+
+                // ✅ Now render — data is ready
+                initFeatured();
+                initListings();
+                initHomeMap();
+                updateCategoryCounts();
+            })
+            .catch(function (error) {
+                console.error('Error fetching listings:', error);
+                showToast('Failed to load listings. Please refresh the page.', 'error');
+            });
     });
 
     /* ================================================
        GOOGLE MAPS — Async-safe readiness check.
-
-       Directorist loads the Maps API asynchronously.
-       We poll until google.maps AND google.maps.marker
-       are both available before initialising our maps.
-       This prevents the "Cannot read properties of
-       undefined" crashes seen in the console.
     ================================================ */
     function whenMapsReady(callback) {
         if (
@@ -224,17 +159,6 @@ jQuery(document).ready(function ($) {
 
     /* ================================================
        CURRENT LOCATION — shared helpers
-
-       addLocationButton(map)
-         Injects a "locate me" button into the map UI.
-         Clicking it calls the Geolocation API, drops a
-         pulsing blue dot at the user's position, and
-         pans + zooms the map to that position.
-
-       placeUserMarker(map, lat, lng, markerRef)
-         Creates (or moves) the custom pulsing dot marker.
-         Returns the new AdvancedMarkerElement so the
-         caller can store a reference for later updates.
     ================================================ */
     function addLocationButton(map, markerRefSetter) {
         var btn = document.createElement('button');
@@ -256,7 +180,6 @@ jQuery(document).ready(function ($) {
             'outline:none',
         ].join(';');
 
-        /* Location crosshair SVG icon */
         btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="4 2"/></svg>';
 
         btn.addEventListener('mouseenter', function () { btn.style.background = '#f0f0f0'; });
@@ -287,10 +210,8 @@ jQuery(document).ready(function ($) {
             );
         });
 
-        /* Place button in the RIGHT_BOTTOM control slot */
         map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(btn);
 
-        /* Push the entire RIGHT_BOTTOM control panel up from the bottom edge */
         google.maps.event.addListenerOnce(map, 'idle', function () {
             var container = btn.parentElement;
             if (container) { container.style.marginBottom = '20px'; }
@@ -298,10 +219,8 @@ jQuery(document).ready(function ($) {
     }
 
     function placeUserMarker(map, lat, lng, existingMarker) {
-        /* Remove old marker if present */
         if (existingMarker) { existingMarker.map = null; }
 
-        /* Build the pulsing blue dot element */
         var dot = document.createElement('div');
         dot.style.cssText = [
             'width:16px',
@@ -313,7 +232,6 @@ jQuery(document).ready(function ($) {
             'animation:stl-pulse 1.8s ease-out infinite',
         ].join(';');
 
-        /* Inject keyframes once */
         if (!document.getElementById('stl-pulse-style')) {
             var style = document.createElement('style');
             style.id = 'stl-pulse-style';
@@ -329,13 +247,6 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    /* ================================================
-       CURRENT LOCATION — auto-center on page load
-       Called once per map immediately after init.
-       Silently falls back to the default London center
-       if the user denies permission or geolocation
-       is unavailable — no error toast on auto-load.
-    ================================================ */
     function centerMapOnUser(map, markerRefSetter) {
         if (!navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition(
@@ -347,7 +258,7 @@ jQuery(document).ready(function ($) {
                 markerRefSetter(lat, lng);
             },
             function () {
-                /* Permission denied or unavailable — keep default center, no toast */
+                /* Permission denied — keep default center */
             }
         );
     }
@@ -377,7 +288,9 @@ jQuery(document).ready(function ($) {
     /* ---- Category counts ---- */
     function updateCategoryCounts() {
         var counts = { room: 0, flat: 0, house: 0 };
-        STL_DATA.forEach(function (p) { counts[p.category]++; });
+        STL_DATA.forEach(function (p) {
+            if (counts[p.category] !== undefined) counts[p.category]++;
+        });
         var el = document.getElementById('stlRoomCount');
         if (el) el.textContent = counts.room + ' listing' + (counts.room !== 1 ? 's' : '') + ' available';
         el = document.getElementById('stlFlatCount');
@@ -465,7 +378,7 @@ jQuery(document).ready(function ($) {
             '<div class="stl-property-card-image">' +
             '<img src="' + p.image + '" alt="' + p.title + '" loading="lazy">' +
             '<span class="stl-property-badge ' + p.category + '">' + p.category + '</span>' +
-            '<div class="stl-property-price"><span class="stl-property-price-value">£' + p.price.toLocaleString() + '</span><span class="stl-property-price-period">/mo</span></div>' +
+            '<div class="stl-property-price"><span class="stl-property-price-value">£' + (p.price ? p.price.toLocaleString() : '—') + '</span><span class="stl-property-price-period">/mo</span></div>' +
             '</div>' +
             '<div class="stl-property-card-body">' +
             '<h3 class="stl-property-card-title">' + p.title + '</h3>' +
@@ -482,21 +395,24 @@ jQuery(document).ready(function ($) {
 
     /* ================================================
        GOOGLE MAPS — Home Map
-       Uses AdvancedMarkerElement (replaces deprecated
-       google.maps.Marker).
-       Waits for Maps API to be fully ready before init.
     ================================================ */
     function initHomeMap() {
         var el = document.getElementById('stlHomeMap');
         if (!el) return;
 
         whenMapsReady(function () {
-            if (homeMap) return; // already initialised
+            if (homeMap) {
+                // Map already exists — just re-add markers for new data
+                homeMarkers.forEach(function (m) { m.map = null; });
+                homeMarkers = [];
+                addHomeMarkers();
+                return;
+            }
 
             homeMap = new google.maps.Map(el, {
                 center: { lat: 51.535, lng: -0.1 },
                 zoom: 12,
-                mapId: 'STL_HOME_MAP' // required for AdvancedMarkerElement
+                mapId: 'STL_HOME_MAP'
             });
 
             addLocationButton(homeMap, function (lat, lng) {
@@ -507,26 +423,25 @@ jQuery(document).ready(function ($) {
                 homeUserMarker = placeUserMarker(homeMap, lat, lng, homeUserMarker);
             });
 
-            STL_DATA.forEach(function (p) {
-                var pin = new google.maps.marker.AdvancedMarkerElement({
-                    position: { lat: p.lat, lng: p.lng },
-                    map: homeMap,
-                    title: p.title
-                });
+            addHomeMarkers();
+        });
+    }
 
-                pin.addListener('click', function () {
-                    openModal(p.id);
-                });
-
-                homeMarkers.push(pin);
+    function addHomeMarkers() {
+        STL_DATA.forEach(function (p) {
+            if (isNaN(p.lat) || isNaN(p.lng)) return;
+            var pin = new google.maps.marker.AdvancedMarkerElement({
+                position: { lat: p.lat, lng: p.lng },
+                map: homeMap,
+                title: p.title
             });
+            pin.addListener('click', function () { openModal(p.id); });
+            homeMarkers.push(pin);
         });
     }
 
     /* ================================================
        GOOGLE MAPS — Main Map (Map tab)
-       Same pattern: waits for API, uses
-       AdvancedMarkerElement, mapId required.
     ================================================ */
     function initMainMap() {
         var el = document.getElementById('stlMainMap');
@@ -537,7 +452,7 @@ jQuery(document).ready(function ($) {
                 mainMap = new google.maps.Map(el, {
                     center: { lat: 51.535, lng: -0.1 },
                     zoom: 12,
-                    mapId: 'STL_MAIN_MAP' // required for AdvancedMarkerElement
+                    mapId: 'STL_MAIN_MAP'
                 });
 
                 addLocationButton(mainMap, function (lat, lng) {
@@ -568,11 +483,8 @@ jQuery(document).ready(function ($) {
 
     /* ================================================
        GOOGLE MAPS — Render markers
-       Uses AdvancedMarkerElement.
-       To remove markers: set .map = null (not setMap).
     ================================================ */
     function renderMapMarkers() {
-        // AdvancedMarkerElement: remove by setting map property to null
         mainMarkers.forEach(function (m) { m.map = null; });
         mainMarkers = [];
 
@@ -581,21 +493,18 @@ jQuery(document).ready(function ($) {
         });
 
         filtered.forEach(function (p) {
+            if (isNaN(p.lat) || isNaN(p.lng)) return;
             var pin = new google.maps.marker.AdvancedMarkerElement({
                 position: { lat: p.lat, lng: p.lng },
                 map: mainMap,
                 title: p.title
             });
-
-            pin.addListener('click', function () {
-                openModal(p.id);
-            });
-
+            pin.addListener('click', function () { openModal(p.id); });
             mainMarkers.push(pin);
         });
     }
 
-    /* ---- Map Sidebar (unchanged) ---- */
+    /* ---- Map Sidebar ---- */
     function renderMapSidebar() {
         var filtered = STL_DATA.filter(function (p) {
             return activeMapCat === 'all' || p.category === activeMapCat;
@@ -613,7 +522,7 @@ jQuery(document).ready(function ($) {
                 '<div class="stl-property-card-body">' +
                 '<h3 class="stl-property-card-title">' + p.title + '</h3>' +
                 '<p class="stl-property-card-location">📍 ' + p.location + '</p>' +
-                '<strong style="color:hsl(213 85% 50%);font-family:var(--stl-font-display);">£' + p.price.toLocaleString() + '/mo</strong>' +
+                '<strong style="color:hsl(213 85% 50%);font-family:var(--stl-font-display);">£' + (p.price ? p.price.toLocaleString() : '—') + '/mo</strong>' +
                 '</div></div>';
         }).join('');
     }
@@ -642,7 +551,7 @@ jQuery(document).ready(function ($) {
             '<span class="stl-modal-category-badge">' + p.category + '</span>' +
             '<h2 class="stl-modal-title">' + p.title + '</h2>' +
             '<p class="stl-modal-location">📍 ' + p.location + '</p>' +
-            '<p class="stl-modal-price">£' + p.price.toLocaleString() + '<span style="font-size:1rem;color:hsl(215 18% 50%);font-weight:400;">/month</span></p>' +
+            '<p class="stl-modal-price">£' + (p.price ? p.price.toLocaleString() : '—') + '<span style="font-size:1rem;color:hsl(215 18% 50%);font-weight:400;">/month</span></p>' +
             '<div class="stl-modal-stats">' +
             '<div class="stl-modal-stat"><strong>' + p.beds + '</strong>Bedroom' + (p.beds !== 1 ? 's' : '') + '</div>' +
             '<div class="stl-modal-stat"><strong>' + p.baths + '</strong>Bathroom' + (p.baths !== 1 ? 's' : '') + '</div>' +
@@ -658,8 +567,9 @@ jQuery(document).ready(function ($) {
             '</div>' +
             '<div class="stl-modal-section">' +
             '<h3 class="stl-modal-section-title">Contact ' + p.owner + '</h3>' +
-            '<a class="stl-modal-contact-btn" href="tel:' + p.phone + '">📞 ' + p.phone + '</a>&nbsp;&nbsp;' +
-            '<a class="stl-modal-contact-btn" href="mailto:' + p.email + '" style="background:hsl(158 55% 45%)">✉️ Email</a>' +
+            (p.phone ? '<a class="stl-modal-contact-btn" href="tel:' + p.phone + '">📞 ' + p.phone + '</a>&nbsp;&nbsp;' : '') +
+            (p.email ? '<a class="stl-modal-contact-btn" href="mailto:' + p.email + '" style="background:hsl(158 55% 45%)">✉️ Email</a>' : '') +
+            (p.link ? '<br><br><a class="stl-modal-contact-btn" href="' + p.link + '" target="_blank" style="background:hsl(213 85% 50%)">🔗 View Full Listing</a>' : '') +
             '</div>';
         overlay.classList.remove('stl-hidden');
         document.body.style.overflow = 'hidden';
