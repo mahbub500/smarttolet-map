@@ -70,6 +70,34 @@ jQuery(document).ready(function ($) {
 (function () {
     'use strict';
 
+   	var url = window.location.origin; // safer than href
+	var api_url = url + '/wp-json/directorist/v1/listings';
+
+	var listings = [];
+
+	fetch(api_url)
+	    .then(function(response) {
+	        return response.json();
+	    })
+	    .then(function(data) {
+	        // data contains all listings
+	        data.forEach(function(listing) {
+	            var simplified = {
+			        name: listing.name,
+			        slug: listing.slug
+			    };
+	            // you can also push to your array
+	            // listings.push(listing);
+	        });
+
+	        console.log('All listings:', listings);
+	    })
+	    .catch(function(error) {
+	        console.error('Error fetching data:', error);
+	    });
+
+    // alert( api_url );
+
     /* ---- Sample data (replace with WP REST or ACF calls) ---- */
     var STL_DATA = [
         {
@@ -245,7 +273,6 @@ jQuery(document).ready(function ($) {
                 function (pos) {
                     var lat = pos.coords.latitude;
                     var lng = pos.coords.longitude;
-                    console.log('Current location — lat:', lat, '| lng:', lng);
                     map.panTo({ lat: lat, lng: lng });
                     map.setZoom(15);
                     markerRefSetter(lat, lng);
@@ -315,7 +342,6 @@ jQuery(document).ready(function ($) {
             function (pos) {
                 var lat = pos.coords.latitude;
                 var lng = pos.coords.longitude;
-                console.log('Current location — lat:', lat, '| lng:', lng);
                 map.panTo({ lat: lat, lng: lng });
                 map.setZoom(15);
                 markerRefSetter(lat, lng);
