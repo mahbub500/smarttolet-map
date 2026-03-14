@@ -13,19 +13,7 @@ get_header();
 ?>
 
 <!-- SmartToLet Template Wrapper -->
-<div class="smarttolet-template">
-
-    <!-- =============================================
-         Page Tab Navigation
-    ============================================= -->
-   <!--  <div class="stl-container" style="padding-top:1.5rem;">
-        <div class="stl-page-tabs" id="stlPageTabs">
-            <button class="stl-page-tab active" data-tab="home">🏠 Home</button>
-            <button class="stl-page-tab" data-tab="listings">📋 Listings</button>
-            <button class="stl-page-tab" data-tab="map">🗺️ Map Search</button>
-            <button class="stl-page-tab" data-tab="post">➕ Post Property</button>
-        </div>
-    </div> -->
+<div class="smarttolet-template">  
 
     <!-- =============================================
          TAB: HOME
@@ -231,7 +219,17 @@ get_header();
                         <h2 class="stl-section-title">Recent Listings</h2>
                         <p class="stl-section-description">Fresh properties added recently</p>
                     </div>
-                    <button class="stl-btn stl-btn-outline" onclick="STL.switchTab('listings')">
+
+                    <?php 
+                    // Get page ID
+                    $page_id = directorist_get_page_id( 'listings' );
+
+                    // Get page URL
+                    $page_url = get_permalink( $page_id );
+                    // var_dump( $page_url );
+                    
+                    ?>
+                    <button class="stl-btn stl-btn-outline" onclick="window.location.href='<?php echo esc_url( $page_url ); ?>'">
                         View All
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
