@@ -719,3 +719,53 @@
 .smarttolet-template .stl-page-title        { font-size: 2rem; color: hsl(var(--stl-foreground)); }
 @media (min-width: 768px) { .smarttolet-template .stl-page-title { font-size: 2.5rem; } }
 .smarttolet-template .stl-page-description  { color: hsl(var(--stl-muted-foreground)); margin-top: 0.5rem; }
+
+/*All Custom css */
+
+.stl-map-marker{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width:14px;
+    height:14px;
+    margin-right:8px;
+}
+
+.stl-dot{
+    width:10px;
+    height:10px;
+    background:#ff3b3b;
+    border-radius:50%;
+    position:relative;
+    z-index:2;
+}
+
+.stl-map-marker::before,
+.stl-map-marker::after{
+    content:"";
+    position:absolute;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:rgba(255,59,59,0.4);
+    animation: stl-pulse 2s infinite;
+}
+
+.stl-map-marker::after{
+    animation-delay:1s;
+}
+
+@keyframes stl-pulse{
+    0%{
+        transform:scale(1);
+        opacity:0.8;
+    }
+    70%{
+        transform:scale(2.8);
+        opacity:0;
+    }
+    100%{
+        opacity:0;
+    }
+}

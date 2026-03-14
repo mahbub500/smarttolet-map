@@ -94,7 +94,12 @@ get_header();
         <section class="stl-map-preview">
             <div class="stl-container">
                 <div id="stl-map" class="stl-section-header">
-                    <span class="stl-section-tag">📍 Live Map</span>
+                   <span class="stl-section-tag">
+                        <span class="stl-map-marker">
+                            <span class="stl-dot"></span>
+                        </span>
+                        Live Map
+                    </span>
                     <h2 class="stl-section-title">Explore Properties on the Map</h2>
                     <p class="stl-section-description">Click any pin to view property details instantly</p>
                 </div>
