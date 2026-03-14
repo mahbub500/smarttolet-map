@@ -2,17 +2,34 @@
    SmartToLet — Inline JavaScript Controller
    Scoped to the STL namespace to avoid
    conflicts with WordPress / dRestaurant JS.
+
+   Google Maps version — uses:
+   - google.maps.Map
+   - google.maps.marker.AdvancedMarkerElement  (replaces deprecated Marker)
+   - Async-safe: waits for google object instead of double-loading the API
+
+   IMPORTANT — Do NOT add a second Google Maps <script> tag.
+   Directorist already loads the Maps API. In functions.php, make
+   this script depend on Directorist's map handle so it loads after:
+
+     wp_enqueue_script(
+         'stl-front',
+         get_template_directory_uri() . '/js/Front.js',
+         array( 'jquery', 'directorist-google-map' ),
+         '1.0',
+         true
+     );
 =========================================== */
 
 jQuery(document).ready(function ($) {
 
     var stl_words = [
-        "Rental", 
-        "Home", 
+        "Rental",
+        "Home",
         "Sublet",
-        "Bachelor", 
-        "Apartment", 
-        "Flat", 
+        "Bachelor",
+        "Apartment",
+        "Flat",
         "Room"
     ];
     var stl_index = 0;
@@ -21,26 +38,22 @@ jQuery(document).ready(function ($) {
     var stl_el = $(".stl-flip-word");
 
     function typeEffect() {
-
         if (stl_charIndex < stl_words[stl_index].length) {
             stl_currentWord += stl_words[stl_index].charAt(stl_charIndex);
             stl_el.text(stl_currentWord);
             stl_charIndex++;
             setTimeout(typeEffect, 100);
-        } 
-        else {
+        } else {
             setTimeout(eraseEffect, 1500);
         }
     }
 
     function eraseEffect() {
-
         if (stl_currentWord.length > 0) {
             stl_currentWord = stl_currentWord.slice(0, -1);
             stl_el.text(stl_currentWord);
             setTimeout(eraseEffect, 50);
-        } 
-        else {
+        } else {
             stl_index++;
             if (stl_index >= stl_words.length) {
                 stl_index = 0;
@@ -151,6 +164,28 @@ jQuery(document).ready(function ($) {
         initModal();
     });
 
+    /* ================================================
+       GOOGLE MAPS — Async-safe readiness check.
+
+       Directorist loads the Maps API asynchronously.
+       We poll until google.maps AND google.maps.marker
+       are both available before initialising our maps.
+       This prevents the "Cannot read properties of
+       undefined" crashes seen in the console.
+    ================================================ */
+    function whenMapsReady(callback) {
+        if (
+            typeof google !== 'undefined' &&
+            typeof google.maps !== 'undefined' &&
+            typeof google.maps.marker !== 'undefined' &&
+            typeof google.maps.marker.AdvancedMarkerElement !== 'undefined'
+        ) {
+            callback();
+        } else {
+            setTimeout(function () { whenMapsReady(callback); }, 250);
+        }
+    }
+
     /* ---- Tabs ---- */
     function initTabs() {
         document.querySelectorAll('.stl-page-tab').forEach(function (btn) {
@@ -207,7 +242,6 @@ jQuery(document).ready(function ($) {
     /* ---- Listings ---- */
     function initListings() {
         renderListings();
-        // Search
         var inp = document.getElementById('stlSearchInput');
         if (inp) {
             inp.addEventListener('input', function () {
@@ -215,7 +249,6 @@ jQuery(document).ready(function ($) {
                 renderListings();
             });
         }
-        // Category tabs
         document.querySelectorAll('#stlCategoryTabs .stl-category-tab').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 activeListingsCat = this.dataset.cat;
@@ -281,63 +314,106 @@ jQuery(document).ready(function ($) {
             '</div></div></div>';
     }
 
-    /* ---- Home Map ---- */
+    /* ================================================
+       GOOGLE MAPS — Home Map
+       Uses AdvancedMarkerElement (replaces deprecated
+       google.maps.Marker).
+       Waits for Maps API to be fully ready before init.
+    ================================================ */
     function initHomeMap() {
-        if (typeof L === 'undefined') return;
         var el = document.getElementById('stlHomeMap');
-        if (!el || homeMap) return;
-        homeMap = L.map('stlHomeMap').setView([51.535, -0.1], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors', maxZoom: 18
-        }).addTo(homeMap);
-        STL_DATA.forEach(function (p) {
-            var marker = L.marker([p.lat, p.lng]).addTo(homeMap);
-            marker.bindPopup('<strong>' + p.title + '</strong><br>£' + p.price + '/mo<br><small>' + p.location + '</small>');
-            marker.on('click', function () { openModal(p.id); });
-        });
-    }
-
-    /* ---- Main Map ---- */
-    function initMainMap() {
-        if (typeof L === 'undefined') return;
-        var el = document.getElementById('stlMainMap');
         if (!el) return;
-        if (!mainMap) {
-            mainMap = L.map('stlMainMap').setView([51.535, -0.1], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors', maxZoom: 18
-            }).addTo(mainMap);
-        }
-        renderMapMarkers();
-        renderMapSidebar();
 
-        // Category tabs in map
-        document.querySelectorAll('#stlMapCategoryTabs .stl-category-tab').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                activeMapCat = this.dataset.cat;
-                document.querySelectorAll('#stlMapCategoryTabs .stl-category-tab').forEach(function (b) { b.classList.remove('active'); });
-                this.classList.add('active');
-                renderMapMarkers();
-                renderMapSidebar();
+        whenMapsReady(function () {
+            if (homeMap) return; // already initialised
+
+            homeMap = new google.maps.Map(el, {
+                center: { lat: 51.535, lng: -0.1 },
+                zoom: 12,
+                mapId: 'STL_HOME_MAP' // required for AdvancedMarkerElement
+            });
+
+            STL_DATA.forEach(function (p) {
+                var pin = new google.maps.marker.AdvancedMarkerElement({
+                    position: { lat: p.lat, lng: p.lng },
+                    map: homeMap,
+                    title: p.title
+                });
+
+                pin.addListener('click', function () {
+                    openModal(p.id);
+                });
+
+                homeMarkers.push(pin);
             });
         });
-        setTimeout(function () { mainMap.invalidateSize(); }, 200);
     }
 
+    /* ================================================
+       GOOGLE MAPS — Main Map (Map tab)
+       Same pattern: waits for API, uses
+       AdvancedMarkerElement, mapId required.
+    ================================================ */
+    function initMainMap() {
+        var el = document.getElementById('stlMainMap');
+        if (!el) return;
+
+        whenMapsReady(function () {
+            if (!mainMap) {
+                mainMap = new google.maps.Map(el, {
+                    center: { lat: 51.535, lng: -0.1 },
+                    zoom: 12,
+                    mapId: 'STL_MAIN_MAP' // required for AdvancedMarkerElement
+                });
+            }
+
+            renderMapMarkers();
+            renderMapSidebar();
+
+            document.querySelectorAll('#stlMapCategoryTabs .stl-category-tab').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    activeMapCat = this.dataset.cat;
+                    document.querySelectorAll('#stlMapCategoryTabs .stl-category-tab').forEach(function (b) {
+                        b.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    renderMapMarkers();
+                    renderMapSidebar();
+                });
+            });
+        });
+    }
+
+    /* ================================================
+       GOOGLE MAPS — Render markers
+       Uses AdvancedMarkerElement.
+       To remove markers: set .map = null (not setMap).
+    ================================================ */
     function renderMapMarkers() {
-        mainMarkers.forEach(function (m) { mainMap.removeLayer(m); });
+        // AdvancedMarkerElement: remove by setting map property to null
+        mainMarkers.forEach(function (m) { m.map = null; });
         mainMarkers = [];
+
         var filtered = STL_DATA.filter(function (p) {
             return activeMapCat === 'all' || p.category === activeMapCat;
         });
+
         filtered.forEach(function (p) {
-            var marker = L.marker([p.lat, p.lng]).addTo(mainMap);
-            marker.bindPopup('<strong>' + p.title + '</strong><br>£' + p.price + '/mo');
-            marker.on('click', function () { openModal(p.id); });
-            mainMarkers.push(marker);
+            var pin = new google.maps.marker.AdvancedMarkerElement({
+                position: { lat: p.lat, lng: p.lng },
+                map: mainMap,
+                title: p.title
+            });
+
+            pin.addListener('click', function () {
+                openModal(p.id);
+            });
+
+            mainMarkers.push(pin);
         });
     }
 
+    /* ---- Map Sidebar (unchanged) ---- */
     function renderMapSidebar() {
         var filtered = STL_DATA.filter(function (p) {
             return activeMapCat === 'all' || p.category === activeMapCat;
