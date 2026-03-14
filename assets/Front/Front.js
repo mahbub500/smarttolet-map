@@ -142,6 +142,7 @@ jQuery(document).ready(function ($) {
 
     var homeMap = null, mainMap = null;
     var homeMarkers = [], mainMarkers = [];
+    var homeUserMarker = null, mainUserMarker = null;
     var activeListingsCat = 'all', activeMapCat = 'all';
     var searchQuery = '';
 
@@ -184,6 +185,107 @@ jQuery(document).ready(function ($) {
         } else {
             setTimeout(function () { whenMapsReady(callback); }, 250);
         }
+    }
+
+    /* ================================================
+       CURRENT LOCATION — shared helpers
+
+       addLocationButton(map)
+         Injects a "locate me" button into the map UI.
+         Clicking it calls the Geolocation API, drops a
+         pulsing blue dot at the user's position, and
+         pans + zooms the map to that position.
+
+       placeUserMarker(map, lat, lng, markerRef)
+         Creates (or moves) the custom pulsing dot marker.
+         Returns the new AdvancedMarkerElement so the
+         caller can store a reference for later updates.
+    ================================================ */
+    function addLocationButton(map, markerRefSetter) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.title = 'Go to my location';
+        btn.style.cssText = [
+            'display:flex',
+            'align-items:center',
+            'justify-content:center',
+            'width:40px',
+            'height:40px',
+            'margin:10px',
+            'padding:0',
+            'background:#fff',
+            'border:none',
+            'border-radius:4px',
+            'box-shadow:0 1px 4px rgba(0,0,0,0.3)',
+            'cursor:pointer',
+            'outline:none',
+        ].join(';');
+
+        /* Location crosshair SVG icon */
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="4 2"/></svg>';
+
+        btn.addEventListener('mouseenter', function () { btn.style.background = '#f0f0f0'; });
+        btn.addEventListener('mouseleave', function () { btn.style.background = '#fff'; });
+
+        btn.addEventListener('click', function () {
+            if (!navigator.geolocation) {
+                showToast('Geolocation is not supported by your browser.', 'error');
+                return;
+            }
+            btn.style.opacity = '0.6';
+            btn.disabled = true;
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    var lat = pos.coords.latitude;
+                    var lng = pos.coords.longitude;
+                    map.panTo({ lat: lat, lng: lng });
+                    map.setZoom(15);
+                    markerRefSetter(lat, lng);
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                },
+                function () {
+                    showToast('Unable to retrieve your location. Please allow location access.', 'error');
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                }
+            );
+        });
+
+        /* Place button in the RIGHT_BOTTOM control slot */
+        map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(btn);
+    }
+
+    function placeUserMarker(map, lat, lng, existingMarker) {
+        /* Remove old marker if present */
+        if (existingMarker) { existingMarker.map = null; }
+
+        /* Build the pulsing blue dot element */
+        var dot = document.createElement('div');
+        dot.style.cssText = [
+            'width:16px',
+            'height:16px',
+            'background:#4285F4',
+            'border:2px solid #fff',
+            'border-radius:50%',
+            'box-shadow:0 0 0 0 rgba(66,133,244,0.5)',
+            'animation:stl-pulse 1.8s ease-out infinite',
+        ].join(';');
+
+        /* Inject keyframes once */
+        if (!document.getElementById('stl-pulse-style')) {
+            var style = document.createElement('style');
+            style.id = 'stl-pulse-style';
+            style.textContent = '@keyframes stl-pulse{0%{box-shadow:0 0 0 0 rgba(66,133,244,0.5)}70%{box-shadow:0 0 0 12px rgba(66,133,244,0)}100%{box-shadow:0 0 0 0 rgba(66,133,244,0)}}';
+            document.head.appendChild(style);
+        }
+
+        return new google.maps.marker.AdvancedMarkerElement({
+            position: { lat: lat, lng: lng },
+            map: map,
+            title: 'Your location',
+            content: dot
+        });
     }
 
     /* ---- Tabs ---- */
@@ -333,6 +435,10 @@ jQuery(document).ready(function ($) {
                 mapId: 'STL_HOME_MAP' // required for AdvancedMarkerElement
             });
 
+            addLocationButton(homeMap, function (lat, lng) {
+                homeUserMarker = placeUserMarker(homeMap, lat, lng, homeUserMarker);
+            });
+
             STL_DATA.forEach(function (p) {
                 var pin = new google.maps.marker.AdvancedMarkerElement({
                     position: { lat: p.lat, lng: p.lng },
@@ -364,6 +470,10 @@ jQuery(document).ready(function ($) {
                     center: { lat: 51.535, lng: -0.1 },
                     zoom: 12,
                     mapId: 'STL_MAIN_MAP' // required for AdvancedMarkerElement
+                });
+
+                addLocationButton(mainMap, function (lat, lng) {
+                    mainUserMarker = placeUserMarker(mainMap, lat, lng, mainUserMarker);
                 });
             }
 
