@@ -238,6 +238,7 @@ jQuery(document).ready(function ($) {
                 function (pos) {
                     var lat = pos.coords.latitude;
                     var lng = pos.coords.longitude;
+                    console.log('Current location — lat:', lat, '| lng:', lng);
                     map.panTo({ lat: lat, lng: lng });
                     map.setZoom(15);
                     markerRefSetter(lat, lng);
@@ -254,6 +255,12 @@ jQuery(document).ready(function ($) {
 
         /* Place button in the RIGHT_BOTTOM control slot */
         map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(btn);
+
+        /* Push the entire RIGHT_BOTTOM control panel up from the bottom edge */
+        google.maps.event.addListenerOnce(map, 'idle', function () {
+            var container = btn.parentElement;
+            if (container) { container.style.marginBottom = '20px'; }
+        });
     }
 
     function placeUserMarker(map, lat, lng, existingMarker) {
@@ -286,6 +293,30 @@ jQuery(document).ready(function ($) {
             title: 'Your location',
             content: dot
         });
+    }
+
+    /* ================================================
+       CURRENT LOCATION — auto-center on page load
+       Called once per map immediately after init.
+       Silently falls back to the default London center
+       if the user denies permission or geolocation
+       is unavailable — no error toast on auto-load.
+    ================================================ */
+    function centerMapOnUser(map, markerRefSetter) {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                var lat = pos.coords.latitude;
+                var lng = pos.coords.longitude;
+                console.log('Current location — lat:', lat, '| lng:', lng);
+                map.panTo({ lat: lat, lng: lng });
+                map.setZoom(15);
+                markerRefSetter(lat, lng);
+            },
+            function () {
+                /* Permission denied or unavailable — keep default center, no toast */
+            }
+        );
     }
 
     /* ---- Tabs ---- */
@@ -439,6 +470,10 @@ jQuery(document).ready(function ($) {
                 homeUserMarker = placeUserMarker(homeMap, lat, lng, homeUserMarker);
             });
 
+            centerMapOnUser(homeMap, function (lat, lng) {
+                homeUserMarker = placeUserMarker(homeMap, lat, lng, homeUserMarker);
+            });
+
             STL_DATA.forEach(function (p) {
                 var pin = new google.maps.marker.AdvancedMarkerElement({
                     position: { lat: p.lat, lng: p.lng },
@@ -473,6 +508,10 @@ jQuery(document).ready(function ($) {
                 });
 
                 addLocationButton(mainMap, function (lat, lng) {
+                    mainUserMarker = placeUserMarker(mainMap, lat, lng, mainUserMarker);
+                });
+
+                centerMapOnUser(mainMap, function (lat, lng) {
                     mainUserMarker = placeUserMarker(mainMap, lat, lng, mainUserMarker);
                 });
             }
