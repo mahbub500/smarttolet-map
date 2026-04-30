@@ -56,7 +56,7 @@ get_header();
                         Search on Map
                     </a>
                     <button class="stl-btn stl-btn-lg stl-btn-outline" onclick="STL.switchTab('listings')">
-                        Browse Listings
+                        Browse Tolet
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
                 </div>
@@ -64,7 +64,7 @@ get_header();
                 <div class="stl-hero-stats">
                     <div class="stl-stat-item">
                         <span class="stl-stat-value" id="stlTotalCount">6+</span>
-                        <span class="stl-stat-label">Active Listings</span>
+                        <span class="stl-stat-label">Active Tolet</span>
                     </div>
                     <div class="stl-stat-item">
                         <span class="stl-stat-value">3</span>
@@ -147,7 +147,7 @@ get_header();
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="hsl(158 55% 45%)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         </div>
                         <h3 class="stl-feature-title">Free Forever</h3>
-                        <p class="stl-feature-description">No charges for listings or browsing, ever</p>
+                        <p class="stl-feature-description">No charges for Tolet or browsing, ever</p>
                     </div>
                     <div class="stl-feature-card">
                         <div class="stl-feature-icon" style="background:hsl(213 85% 50% / 0.15);">
@@ -216,7 +216,7 @@ get_header();
                 <div class="stl-recent-header">
                     <div>
                         <span class="stl-section-tag text-primary">Latest</span>
-                        <h2 class="stl-section-title">Recent Listings</h2>
+                        <h2 class="stl-section-title">Recent Browse Listings</h2>
                         <p class="stl-section-description">Fresh properties added recently</p>
                     </div>
 
@@ -251,7 +251,7 @@ get_header();
                 <p class="stl-cta-description">Reach thousands of potential tenants. No hidden fees, no commissions. Just post and connect.</p>
                 <div class="stl-cta-buttons">
                     <button class="stl-btn stl-btn-lg stl-btn-white" onclick="STL.switchTab('post')">Post Your Property</button>
-                    <button class="stl-btn stl-btn-lg stl-btn-outline-white" onclick="STL.switchTab('listings')">Browse Listings</button>
+                    <button class="stl-btn stl-btn-lg stl-btn-outline-white" onclick="STL.switchTab('listings')">Browse Browse Listings</button>
                 </div>
             </div>
         </section>
